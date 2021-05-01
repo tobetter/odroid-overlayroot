@@ -1,0 +1,16 @@
+#!/bin/sh
+
+vendordir="/overlay/vendor"
+
+list=$(find $vendordir \( ! -name lost+found \) -type f)
+[ "x$list" = "x" ] && exit 0
+
+mount -o remount,rw $vendordir
+
+for file in $list; do
+        src=${file##${vendordir}}
+        cp -f $src /overlay/vendor$src
+done
+
+mount -o remount,ro $vendordir
+sync
