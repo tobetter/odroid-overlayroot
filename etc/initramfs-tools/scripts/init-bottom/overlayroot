@@ -1,0 +1,57 @@
+#!/bin/sh
+
+PREREQ=""
+
+prereqs()
+{
+	echo "$PREREQ"
+}
+
+case $1 in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+. /scripts/functions
+. /etc/default/overlayroot
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+log_begin_msg "Starting overlay"
+log_end_msg
+
+mkdir -p /overlay
+
+root_rw=/overlay/root_rw
+root_ro=/overlay/root_ro
+vendor=/overlay/vendor
+workdir=/overlay/.workdir
+
+mount -t tmpfs tmpfs-root /overlay || fail "failed to create tmpfs"
+
+mkdir -p $root_rw
+mkdir -p $root_ro
+mkdir -p $workdir
+
+mount -n -o move $rootmnt $root_ro
+
+lowerdir="$root_ro"
+
+if [ -n "$vendordevice" ]; then
+	mkdir -p $vendor
+	mount -o ro $vendordevice $vendor && lowerdir=$lowerdir:$vendor
+fi
+
+mount -t overlay overlay -olowerdir=$lowerdir,upperdir=$root_rw,workdir=$workdir $rootmnt
+
+mkdir -p $rootmnt/overlay
+mount -n -o rbind /overlay $rootmnt/overlay
+
+cp $rootmnt/etc/fstab $rootmnt/etc/fstab.orig
+awk '$2 != "/" {print $0}' $rootmnt/etc/fstab.orig > $rootmnt/etc/fstab
+awk '$2 == "'$rootmnt'" { $2 = "/" ; print $0}' /etc/mtab >> $rootmnt/etc/fstab
+rm $rootmnt/etc/fstab.orig
+
+exit 0

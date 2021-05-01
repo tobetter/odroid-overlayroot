@@ -1,0 +1,17 @@
+Source: odroid-overlayroot
+Section: utils
+Priority: optional
+Maintainer: Dongjin Kim <tobetter@gmail.com>
+Uploaders: Dongjin Kim <tobetter@gmail.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.6
+Vcs-Browser: https://github.com/tobetter/odroid-overlayroot.git
+Vcs-Git: https://github.com/tobetter/odroid-overlayroot.git
+Rules-Requires-Root: no
+
+Package: odroid-overlayroot
+Architecture: any
+Depends: ${misc:Depends},
+         initramfs-tools (>= 0.92f),
+Description: utility to make root file system using overlay
+  file system and manage vendor specific files on top it.

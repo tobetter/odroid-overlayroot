@@ -1,0 +1,22 @@
+#!/bin/sh
+
+PREREQ=""
+
+prereqs()
+{
+	echo "$PREREQ"
+}
+
+case $1 in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+manual_add_modules overlay
+
+mkdir -p "${DESTDIR}/etc/default"
+cp -a "/etc/default/overlayroot" "${DESTDIR}/etc/default"
